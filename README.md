@@ -1,8 +1,10 @@
 # 自动打卡教程
 
- **如果看不到本文的图片，就查看仓库内的pdf文件**
- 
-如果这个仓库帮到了你，请给我一颗star 哈哈。
+本程序的workflow代码灵感来源于@FurryPotato，Python打卡部分的程序实现来源于我的朋友DW。
+
+由于本程序的实现和@FurryPotato的方法不同，因此设定过程也需要略加修改。
+
+如果这个仓库帮到了你，也别给我给我一颗star。
 
 首先你需要拥有一个github，直接在左上角注册就行了。
 
@@ -20,33 +22,46 @@ Fork的含义是将本仓库拷贝一份，放到你自己的github账号下，�
 
 此时你已经拥有了本仓库的一个拷贝。
 
-### Step2. 添加账户密码
+### Step2. 添加cookies
 
-点击仓库的右上角的Settings：
+打开DingHealthReport.py文件，找到deal_person函数，遵循注释完成cookies提取：
 
-![image-20210504141844386](https://tva1.sinaimg.cn/large/008i3skNly1gq6deuzmfvj31vo0mcdkc.jpg)
+```python
+此函数是打卡功能的顶层函数，通过传入不同的cookies实现为多人打卡，
+url_save = 'https://healthreport.zju.edu.cn/ncov/wap/default/save'
+url_index = 'https://healthreport.zju.edu.cn/ncov/wap/default/index'
 
-点击下面的Secret
+# 给出headers和cookies，令其可以免登录
+# headers和cookies的确定方法为：
+# 1. Chrome打开无痕页面，键入url_save网址，返回登录界面
+# 2. 右键审查元素或者按F12，找到network栏
+# 3. 输入账号密码并登录，然后找到“index”的“requests headers”一栏
+# 4. 将cookie中的所有内容全部复制粘贴到116行附近的cookies1 = ‘’中，用以完成请求头。
+```
 
-![image-20210504141905641](https://tva1.sinaimg.cn/large/008i3skNly1gq6df8l52dj31l90u045g.jpg)
+### Step4. 配置微信推送
 
-点击New repository，添加一个Secret
+打开https://sct.ftqq.com 注册账号获取sendkey，以获得微信消息推送。
 
-![image-20210504142045807](https://tva1.sinaimg.cn/large/008i3skNly1gq6dgz81vpj31n00pwmz0.jpg)
+将新得到的sendkey替换程序中116行附近原有的SendKey1的值。
 
-Name必须为ACCOUNT，Value填入自己的浙大通行证账号。然后仿照上面的操作，再添加一个Name为PASSWORD，Value为浙大通行证密码的Secret，自动打卡脚本就配置完成了。
+### Step5. 如何触发打卡？
 
-效果和下面的差不多：
+**在触发打卡前，请确保sendkey和cookies已经更新。**
 
-![image-20210504142239194](https://tva1.sinaimg.cn/large/008i3skNly1gq6diybkrfj31l10u0wjv.jpg)
+**只有单人打卡时，请删除120-122行附近的内容：**
 
-### Step3. 如何触发打卡？
+**Line 120** cookies2 = 'xxxxx'
 
-有两种方式，第一种是在自己的ZJU-Clock-In仓库里点击Star（已经Star的就取消Star，再重新点击）。
+**Line 121** SendKey2 = 'yyyyy'  # other one
+
+**Line 122** deal_person(cookies=cookies2, send_key=SendKey2)
+
+触发打卡有两种方式，第一种是在自己的ZJU-Clock-In仓库里点击Star（已经Star的就取消Star，再重新点击）。
 
 第二种是等待12小时，这个脚本是每隔12小时触发一次的。
 
-### Step4. 如何判断打卡是否成功？
+### Step6. 如何判断打卡是否成功？
 
 点击仓库的Action：
 
@@ -61,16 +76,3 @@ Name必须为ACCOUNT，Value填入自己的浙大通行证账号。然后仿照�
 ![image-20210504142839755](https://tva1.sinaimg.cn/large/008i3skNly1gq6dp77angj320v0u079c.jpg)
 
 就可以看到提示信息了，如果打卡失败，就按照提示去操作就好了。
-
-## Q&A
-
-### Q: 这个脚本安全么？
-
-这个脚本是开源的，大家可以自由观看它的代码，内容很简单，没有任何窃取个人信息的操作
-
-我们的账户密码是放入github的secret中的，只有仓库的所有者才能看到你设置的ACCOUNT和PASSWORD。
-
-这个项目的所有者虽然是我，但你是先Fork再操作的，此时Fork得到的仓库所有者是你自己，我们所有的操作都是在Fork后进行的，我是没有办法看到你的secret的。
-
-所以只要保证你自己的github账号密码不泄漏，浙大通行证的密码就是安全的。
-
